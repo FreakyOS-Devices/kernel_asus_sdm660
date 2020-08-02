@@ -1,20 +1,21 @@
 #!/bin/bash
 
-set -o errexit
-
-[[ $# -eq 1 ]] || exit 1
-
-DEVICE=$1
+read -p 'Enter device codename: ' DEVICE
+read -p 'Enter kernel upstreamed version: ' VERSION
 
 if [[ $DEVICE != X00T ]]; then
-    echo invalid device codename
+    echo Invalid Device codename. Edith build.sh according to your device codename.
+    echo STOP!
     exit 1
 fi
+echo ''
+echo Starting kernel build.
+echo ''
 
 TOP=$(realpath ../)
 
-export KBUILD_BUILD_USER=prabhat774
-export KBUILD_BUILD_HOST=linux
+export KBUILD_BUILD_USER=pkm774
+export KBUILD_BUILD_HOST=ubuntu
 
 PATH="$TOP/tools/build-tools/linux-x86/bin:$PATH"
 PATH="$TOP/tools/build-tools/path/linux-x86:$PATH"
@@ -25,6 +26,9 @@ PATH="$TOP/tools/misc/linux-x86/lz4:$PATH"
 PATH="$TOP/tools/misc/linux-x86/dtc:$PATH"
 PATH="$TOP/tools/misc/linux-x86/libufdt:$PATH"
 export LD_LIBRARY_PATH="$TOP/tools/clang/host/linux-x86/clang-r353983c/lib64:$LD_LIBRARY_PATH"
+
+rm -rf "$TOP/ZIPS/hmp/Image.gz-dtb"
+rm -rf "$TOP/ZIPS/Kernel_ZIP/HMP"
 
 make \
     O=out \
@@ -49,14 +53,35 @@ make \
     CLANG_TRIPLE=aarch64-linux-gnu- \
     CROSS_COMPILE=aarch64-linux-android- \
     CROSS_COMPILE_ARM32=arm-linux-androideabi-
-    
- 
 
-rm -rf "$TOP/Output/$DEVICE-kernel"
-mkdir -p "$TOP/Output/$DEVICE-kernel"
-cp out/arch/arm64/boot/Image.gz-dtb "$TOP/Output/$DEVICE-kernel"
+FILE='out/arch/arm64/boot/Image.gz-dtb'
+DIR="$TOP/ZIPS"
 
-
+if [[ -f "$FILE" ]] 
+   then    
+   mkdir -p "$TOP/Output/$DEVICE-kernel"
+   if [[ ! -d "$DIR" ]] 
+      then
+      echo ZIPS Folder not found !
+      echo Image.gz-dtb file is saved in $TOP/Output/$DEVICE-kernel folder.
+      exit 1
+   else
+   mkdir -p "$TOP/ZIPS/Kernel_ZIP/HMP"
+   cp out/arch/arm64/boot/Image.gz-dtb "$TOP/Output/$DEVICE-kernel"
+   cd "$TOP/Output/$DEVICE-kernel"
+   cp Image.gz-dtb "$TOP/ZIPS/hmp"
+   cd "$TOP/ZIPS/hmp"
+   zip -r "$TOP/ZIPS/Kernel_ZIP/HMP/Disaster_HMP-v$VERSION.zip" *
+   echo ''
+   echo ''
+   echo 'Kernel Build Successful !!!!'
+   fi
+else
+echo ''
+echo ''
+echo 'Kernel build Unsuccessfull !!!!'
+echo ''
+fi
 
 
 
