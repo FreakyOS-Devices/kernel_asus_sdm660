@@ -74,7 +74,7 @@ if [[ -f "$FILE" ]]
    cd "$TOP/Output/$DEVICE-kernel"
    cp Image.gz-dtb "$TOP/ZIPS/hmp"
    cd "$TOP/ZIPS/hmp"
-   zip -r "$TOP/ZIPS/Kernel_ZIP/HMP/Disaster_HMP-v$VERSION.zip" *
+   zip -r "$TOP/ZIPS/Kernel_ZIP/HMP/ProjectInfinity_HMP-v$VERSION.zip" *
    echo ''
    echo ''
    echo 'Kernel Build Successful !!!!'
